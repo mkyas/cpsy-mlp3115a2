@@ -112,6 +112,7 @@ float MPL3115A2::pressure()
 
 float MPL3115A2::altitude()
 {
+	this->_set_mode(1);
 	this->_one_shot();
 	this->_await_completion();
 	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
@@ -130,7 +131,6 @@ float MPL3115A2::altitude()
 
 float MPL3115A2::temperature()
 {
-	this->_set_mode(1);
 	this->_one_shot();
 	this->_await_completion();
 	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
