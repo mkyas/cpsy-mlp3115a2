@@ -66,9 +66,7 @@ MPL3115A2::~MPL3115A2()
 
 void MPL3115A2::_set_mode(std::uint8_t mode)
 {
-	while (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::CTRL_REG1_OST) < 0) {
-		nanosleep(&centisec, nullptr);
-	}
+	this->_ctrl_reg1.reg = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::CTRL_REG1);
 	this->_ctrl_reg1.bit.ALT = mode;
 	i2c_smbus_write_byte_data(this->smbus, MPL3115A2::CTRL_REG1, this->_ctrl_reg1.reg);
 }
@@ -86,7 +84,7 @@ void MPL3115A2::_one_shot(void)
 
 void MPL3115A2::_await_completion(void)
 {
-	while (0 != (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::REGISTER_STATUS) & MPL3115A2::REGISTER_STATUS_PTDR)) {
+	while (0 == (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::REGISTER_STATUS) & MPL3115A2::REGISTER_STATUS_PTDR)) {
 		nanosleep(&centisec, nullptr);
 	}
 }
@@ -133,7 +131,6 @@ float MPL3115A2::temperature()
 	this->_set_mode(1);
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
 	i2c_smbus_read_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, this->buffer);
 	std::uint32_t t;
 	if constexpr (std::endian::native == std::endian::big) {
