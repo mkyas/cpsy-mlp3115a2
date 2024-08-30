@@ -73,10 +73,10 @@ void MPL3115A2::_set_mode(std::uint8_t mode)
 
 void MPL3115A2::_one_shot(void)
 {
-	this->_ctrl_reg1.reg = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::REGISTER_STATUS);
+	this->_ctrl_reg1.reg = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::CTRL_REG1);
 	while (this->_ctrl_reg1.bit.OST) {
 		nanosleep(&centisec, nullptr);
-		this->_ctrl_reg1.reg = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::REGISTER_STATUS);
+		this->_ctrl_reg1.reg = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::CTRL_REG1);
 	}
 	this->_ctrl_reg1.bit.OST = 1;
 	i2c_smbus_write_byte_data(this->smbus, MPL3115A2::CTRL_REG1, this->_ctrl_reg1.reg);
