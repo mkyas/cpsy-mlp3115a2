@@ -96,6 +96,7 @@ float MPL3115A2::pressure()
 	this->_set_mode(0);
 	this->_one_shot();
 	this->_await_completion();
+	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
 	i2c_smbus_read_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, this->buffer);
 	std::uint32_t p;
 	if constexpr (std::endian::native == std::endian::big) {
@@ -113,6 +114,7 @@ float MPL3115A2::altitude()
 {
 	this->_one_shot();
 	this->_await_completion();
+	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
 	i2c_smbus_read_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, this->buffer);
 	std::uint32_t a;
 	if constexpr (std::endian::native == std::endian::big) {
@@ -131,6 +133,7 @@ float MPL3115A2::temperature()
 	this->_set_mode(1);
 	this->_one_shot();
 	this->_await_completion();
+	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
 	i2c_smbus_read_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, this->buffer);
 	std::uint32_t t;
 	if constexpr (std::endian::native == std::endian::big) {
