@@ -34,6 +34,26 @@ MPL3115A2::MPL3115A2(int smbus, std::uint8_t address) : smbus(0), address(addres
 	if (ioctl(this->smbus, I2C_SLAVE, address) < 0) {
 		throw std::runtime_error("Address not found");
 	}
+
+	std::uint8_t whoami = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::WHOAMI);
+	if (whoami != 0xc4) {
+		throw std::runtime_error("Not a MPL3115A2");
+	}
+
+	i2c_smbus_write_byte_data(this->smbus, MPL3115A2::CTRL_REG1, MPL3115A2::CTRL_REG1_RST);
+	while (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::CTRL_REG1) & MPL3115A2::CTRL_REG1_RST) {
+		nanosleep(&centisec, nullptr);
+	}
+
+	// set oversampling and altitude mode
+	_ctrl_reg1.reg = MPL3115A2::CTRL_REG1_OS128 | MPL3115A2::CTRL_REG1_ALT;
+	i2c_smbus_write_byte_data(this->smbus, MPL3115A2::CTRL_REG1, _ctrl_reg1.reg);
+
+  	// enable data ready events for pressure/altitude and temperature
+	i2c_smbus_write_byte_data(this->smbus, MPL3115A2::PT_DATA_CFG,
+			          MPL3115A2::PT_DATA_CFG_TDEFE |
+                                  MPL3115A2::PT_DATA_CFG_PDEFE |
+                                  MPL3115A2::PT_DATA_CFG_DREM);
 }
 
 MPL3115A2::~MPL3115A2()
