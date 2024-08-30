@@ -1,4 +1,4 @@
-CXXFLAGS = -Wall -O2
+CXXFLAGS = -std=c++20 -Wall -O2
 LDLIBS = -li2c
 
 testmpl: testmpl.cc libmpl3115a2.a

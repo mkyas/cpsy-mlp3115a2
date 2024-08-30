@@ -1,4 +1,5 @@
 
+#include <bit>
 #include <ctime>
 
 extern "C" {
@@ -97,21 +98,32 @@ float MPL3115A2::pressure()
 	this->_set_mode(0);
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
 	i2c_smbus_read_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, this->buffer);
-	std::uint32_t p = std::uint32_t(this->buffer[0]) << 16 | std::uint32_t(this->buffer[1]) << 8 | std::uint32_t(this->buffer[2]);
+	std::uint32_t p;
+	if constexpr (std::endian::native == std::endian::big) {
+		p = std::uint32_t(this->buffer[0]) << 16 | std::uint32_t(this->buffer[1]) << 8 | std::uint32_t(this->buffer[2]);
+	} else if constexpr (std::endian::native == std::endian::little) {
+		p = std::uint32_t(this->buffer[2]) << 16 | std::uint32_t(this->buffer[1]) << 8 | std::uint32_t(this->buffer[0]);
+	} else {
+		throw std::runtime_error("Unknown endianess");
+	}
 	return float(p) / 6400.0;
 }
 
 
 float MPL3115A2::altitude()
 {
-	this->_set_mode(1);
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
 	i2c_smbus_read_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, this->buffer);
-	std::uint32_t a = std::uint32_t(this->buffer[0]) << 24 | std::uint32_t(this->buffer[1]) << 16 | std::uint32_t(this->buffer[2] << 8);
+	std::uint32_t a;
+	if constexpr (std::endian::native == std::endian::big) {
+		a = std::uint32_t(this->buffer[0]) << 24 | std::uint32_t(this->buffer[1]) << 16 | std::uint32_t(this->buffer[2] << 8);
+	} else if constexpr (std::endian::native == std::endian::little) {
+		a = std::uint32_t(this->buffer[2]) << 24 | std::uint32_t(this->buffer[1]) << 16 | std::uint32_t(this->buffer[0] << 8);
+	} else {
+		throw std::runtime_error("Unknown endianess");
+	}
 	return float(a) / 65536.0;
 }
 
@@ -123,6 +135,13 @@ float MPL3115A2::temperature()
 	this->_await_completion();
 	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
 	i2c_smbus_read_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, this->buffer);
-	std::uint32_t t = std::uint32_t(this->buffer[3]) << 8 | std::uint32_t(this->buffer[4]);
+	std::uint32_t t;
+	if constexpr (std::endian::native == std::endian::big) {
+		t = std::uint32_t(this->buffer[3]) << 8 | std::uint32_t(this->buffer[4]);
+	} else if constexpr (std::endian::native == std::endian::little) {
+		t = std::uint32_t(this->buffer[4]) << 8 | std::uint32_t(this->buffer[3]);
+	} else {
+		throw std::runtime_error("Unknown endianess");
+	}
 	return float(t) / 256.0;
 }
