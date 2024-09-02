@@ -82,9 +82,9 @@ void MPL3115A2::_one_shot(void)
 	i2c_smbus_write_byte_data(this->smbus, MPL3115A2::CTRL_REG1, this->_ctrl_reg1.reg);
 }
 
-void MPL3115A2::_await_completion(void)
+void MPL3115A2::_await_completion(std::uint8_t status)
 {
-	while (0 == (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::REGISTER_STATUS) & MPL3115A2::REGISTER_STATUS_PTDR)) {
+	while (0 == (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::REGISTER_STATUS) & status)) {
 		nanosleep(&centisec, nullptr);
 	}
 }

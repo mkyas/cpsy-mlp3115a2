@@ -88,7 +88,7 @@ public:
 private:
 	void _set_mode(std::uint8_t mode);
 	void _one_shot(void);
-	void _await_completion(void);
+	void _await_completion(std::uint8_t status = MPL3115A2::REGISTER_STATUS_PTDR);
 };
 
 #endif
