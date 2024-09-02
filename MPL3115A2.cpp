@@ -1,3 +1,4 @@
+/* Data sheet at https://www.nxp.com/docs/en/data-sheet/MPL3115A2.pdf */
 
 #include <bit>
 #include <ctime>
@@ -36,7 +37,7 @@ MPL3115A2::MPL3115A2(int smbus, std::uint8_t address) : smbus(0), address(addres
 		throw std::runtime_error("Address not found");
 	}
 
-	std::uint8_t whoami = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::WHOAMI);
+	std::uint8_t whoami = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::WHO_AM_I);
 	if (whoami != 0xc4) {
 		throw std::runtime_error("Not a MPL3115A2");
 	}
@@ -84,7 +85,7 @@ void MPL3115A2::_one_shot(void)
 
 void MPL3115A2::_await_completion(std::uint8_t status)
 {
-	while (0 == (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::REGISTER_STATUS) & status)) {
+	while (0 == (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::STATUS) & status)) {
 		nanosleep(&centisec, nullptr);
 	}
 }
@@ -96,8 +97,7 @@ float MPL3115A2::pressure()
 	this->_set_mode(0);
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
-	i2c_smbus_read_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, this->buffer);
+	i2c_smbus_read_block_data(this->smbus, MPL3115A2::OUT_P_MSB, this->buffer);
 	std::uint32_t p;
 	if constexpr (std::endian::native == std::endian::big) {
 		p = std::uint32_t(this->buffer[0]) << 16 | std::uint32_t(this->buffer[1]) << 8 | std::uint32_t(this->buffer[2]);
@@ -115,8 +115,7 @@ float MPL3115A2::altitude()
 	this->_set_mode(1);
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
-	i2c_smbus_read_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, this->buffer);
+	i2c_smbus_read_block_data(this->smbus, MPL3115A2::OUT_P_MSB, this->buffer);
 	std::uint32_t a;
 	if constexpr (std::endian::native == std::endian::big) {
 		a = std::uint32_t(this->buffer[0]) << 24 | std::uint32_t(this->buffer[1]) << 16 | std::uint32_t(this->buffer[2] << 8);
@@ -133,8 +132,7 @@ float MPL3115A2::temperature()
 {
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
-	i2c_smbus_read_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, this->buffer);
+	i2c_smbus_read_block_data(this->smbus, MPL3115A2::OUT_P_MSB, this->buffer);
 	std::uint32_t t;
 	if constexpr (std::endian::native == std::endian::big) {
 		t = std::uint32_t(this->buffer[3]) << 8 | std::uint32_t(this->buffer[4]);

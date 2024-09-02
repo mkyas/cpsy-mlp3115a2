@@ -6,21 +6,21 @@
 
 class MPL3115A2
 {
-	static constexpr std::uint8_t ADDRESS                  = 0x60;
+	static constexpr std::uint8_t ADDRESS         = 0x60;
 
-	static constexpr std::uint8_t REGISTER_STATUS          = 0x00;
-	static constexpr std::uint8_t REGISTER_PRESSURE_MSB    = 0x01;
-	static constexpr std::uint8_t REGISTER_PRESSURE_CSB    = 0x02;
-	static constexpr std::uint8_t REGISTER_PRESSURE_LSB    = 0x03;
-	static constexpr std::uint8_t REGISTER_TEMP_MSB        = 0x04;
-	static constexpr std::uint8_t REGISTER_TEMP_LSB        = 0x05;
-	static constexpr std::uint8_t REGISTER_DR_STATUS       = 0x06;
-	static constexpr std::uint8_t OUT_P_DELTA_MSB          = 0x07;
-	static constexpr std::uint8_t OUT_P_DELTA_CSB          = 0x08;
-	static constexpr std::uint8_t OUT_P_DELTA_LSB          = 0x09;
-	static constexpr std::uint8_t OUT_T_DELTA_MSB          = 0x0a;
-	static constexpr std::uint8_t OUT_T_DELTA_LSB          = 0x0b;
-	static constexpr std::uint8_t WHOAMI                   = 0x0c;
+	static constexpr std::uint8_t STATUS          = 0x00;
+	static constexpr std::uint8_t OUT_P_MSB       = 0x01;
+	static constexpr std::uint8_t OUT_P_CSB       = 0x02;
+	static constexpr std::uint8_t OUT_P_LSB       = 0x03;
+	static constexpr std::uint8_t OUT_T_MSB       = 0x04;
+	static constexpr std::uint8_t OUT_T_LSB       = 0x05;
+	static constexpr std::uint8_t DR_STATUS       = 0x06;
+	static constexpr std::uint8_t OUT_P_DELTA_MSB = 0x07;
+	static constexpr std::uint8_t OUT_P_DELTA_CSB = 0x08;
+	static constexpr std::uint8_t OUT_P_DELTA_LSB = 0x09;
+	static constexpr std::uint8_t OUT_T_DELTA_MSB = 0x0a;
+	static constexpr std::uint8_t OUT_T_DELTA_LSB = 0x0b;
+	static constexpr std::uint8_t WHO_AM_I        = 0x0c;
 	static constexpr std::uint8_t BAR_IN_MSB               = 0x14;
 	static constexpr std::uint8_t BAR_IN_LSB               = 0x15;
 	static constexpr std::uint8_t OFF_H                    = 0x2d;
@@ -30,6 +30,7 @@ class MPL3115A2
 	static constexpr std::uint8_t REGISTER_STATUS_PTDR     = 0x08;
 
 	static constexpr std::uint8_t PT_DATA_CFG              = 0x13;
+
 	static constexpr std::uint8_t PT_DATA_CFG_TDEFE        = 0x01;
 	static constexpr std::uint8_t PT_DATA_CFG_PDEFE        = 0x02;
 	static constexpr std::uint8_t PT_DATA_CFG_DREM         = 0x04;
