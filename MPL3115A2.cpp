@@ -96,16 +96,10 @@ float MPL3115A2::pressure()
 	this->_set_mode(0);
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
+	//i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
 	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, 5, this->buffer);
 	std::uint32_t p;
-	if constexpr (std::endian::native == std::endian::big) {
-		p = std::uint32_t(this->buffer[0]) << 16 | std::uint32_t(this->buffer[1]) << 8 | std::uint32_t(this->buffer[2]);
-	} else if constexpr (std::endian::native == std::endian::little) {
-		p = std::uint32_t(this->buffer[2]) << 16 | std::uint32_t(this->buffer[1]) << 8 | std::uint32_t(this->buffer[0]);
-	} else {
-		throw std::runtime_error("Unknown endianess");
-	}
+	p = std::uint32_t(this->buffer[0]) * 65536 + std::uint32_t(this->buffer[1]) * 256 + std::uint32_t(this->buffer[2]);
 	return float(p) / 6400.0;
 }
 
@@ -133,15 +127,9 @@ float MPL3115A2::temperature()
 {
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
+	//i2c_smbus_write_byte(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB);
 	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, 5, this->buffer);
 	std::uint32_t t;
-	if constexpr (std::endian::native == std::endian::big) {
-		t = std::uint32_t(this->buffer[3]) << 8 | std::uint32_t(this->buffer[4]);
-	} else if constexpr (std::endian::native == std::endian::little) {
-		t = std::uint32_t(this->buffer[4]) << 8 | std::uint32_t(this->buffer[3]);
-	} else {
-		throw std::runtime_error("Unknown endianess");
-	}
+	t = std::uint32_t(this->buffer[3])* 256 + std::uint32_t(this->buffer[4]);
 	return float(t) / 256.0;
 }
