@@ -78,7 +78,7 @@ typedef union {
 	std::uint8_t buffer[32];
 
 public:
-	MPL3115A2(int smbus = 1, std::uint8_t address = MPL3115A2::ADDRESS);
+	explicit MPL3115A2(int smbus = 1, std::uint8_t address = MPL3115A2::ADDRESS);
 	MPL3115A2(const MPL3115A2&) = delete;
 	~MPL3115A2();
 

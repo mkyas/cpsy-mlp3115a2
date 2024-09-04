@@ -33,7 +33,7 @@ MPL3115A2::MPL3115A2(int smbus, std::uint8_t address) : smbus(0), address(addres
 		throw std::runtime_error("Device does not exist");
 	}
 
-	if (ioctl(this->smbus, I2C_SLAVE, address) < 0) {
+	if (ioctl(this->smbus, I2C_SLAVE, address & 0x7f) < 0) {
 		throw std::runtime_error("Address not found");
 	}
 
@@ -97,15 +97,9 @@ float MPL3115A2::pressure()
 	this->_set_mode(0);
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_read_block_data(this->smbus, MPL3115A2::OUT_P_MSB, this->buffer);
+	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, 5, this->buffer);
 	std::uint32_t p;
-	if constexpr (std::endian::native == std::endian::big) {
-		p = std::uint32_t(this->buffer[0]) << 16 | std::uint32_t(this->buffer[1]) << 8 | std::uint32_t(this->buffer[2]);
-	} else if constexpr (std::endian::native == std::endian::little) {
-		p = std::uint32_t(this->buffer[2]) << 16 | std::uint32_t(this->buffer[1]) << 8 | std::uint32_t(this->buffer[0]);
-	} else {
-		throw std::runtime_error("Unknown endianess");
-	}
+	p = std::uint32_t(this->buffer[0]) * 65536 + std::uint32_t(this->buffer[1]) * 256 + std::uint32_t(this->buffer[2]);
 	return float(p) / 6400.0;
 }
 
@@ -115,7 +109,7 @@ float MPL3115A2::altitude()
 	this->_set_mode(1);
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_read_block_data(this->smbus, MPL3115A2::OUT_P_MSB, this->buffer);
+	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, 5, this->buffer);
 	std::uint32_t a;
 	if constexpr (std::endian::native == std::endian::big) {
 		a = std::uint32_t(this->buffer[0]) << 24 | std::uint32_t(this->buffer[1]) << 16 | std::uint32_t(this->buffer[2] << 8);
@@ -132,14 +126,8 @@ float MPL3115A2::temperature()
 {
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_read_block_data(this->smbus, MPL3115A2::OUT_P_MSB, this->buffer);
+	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, 5, this->buffer);
 	std::uint32_t t;
-	if constexpr (std::endian::native == std::endian::big) {
-		t = std::uint32_t(this->buffer[3]) << 8 | std::uint32_t(this->buffer[4]);
-	} else if constexpr (std::endian::native == std::endian::little) {
-		t = std::uint32_t(this->buffer[4]) << 8 | std::uint32_t(this->buffer[3]);
-	} else {
-		throw std::runtime_error("Unknown endianess");
-	}
+	t = std::uint32_t(this->buffer[3])* 256 + std::uint32_t(this->buffer[4]);
 	return float(t) / 256.0;
 }
