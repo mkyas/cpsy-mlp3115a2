@@ -82,14 +82,14 @@ public:
 	MPL3115A2(const MPL3115A2&) = delete;
 	~MPL3115A2();
 
-	float pressure();
-	float altitude();
-	float temperature();
+	float pressure(void) noexcept;
+	float altitude(void) noexcept;
+	float temperature(void) noexcept;
 
 private:
-	void _set_mode(std::uint8_t mode);
-	void _one_shot(void);
-	void _await_completion(std::uint8_t status = MPL3115A2::REGISTER_STATUS_PTDR);
+	void _set_mode(std::uint8_t mode) noexcept;
+	void _one_shot(void) noexcept;
+	void _await_completion(std::uint8_t status = MPL3115A2::REGISTER_STATUS_PTDR) noexcept;
 };
 
 #endif

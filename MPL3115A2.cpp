@@ -65,14 +65,14 @@ MPL3115A2::~MPL3115A2()
 
 
 
-void MPL3115A2::_set_mode(std::uint8_t mode)
+void MPL3115A2::_set_mode(std::uint8_t mode) noexcept
 {
 	this->_ctrl_reg1.reg = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::CTRL_REG1);
 	this->_ctrl_reg1.bit.ALT = mode;
 	i2c_smbus_write_byte_data(this->smbus, MPL3115A2::CTRL_REG1, this->_ctrl_reg1.reg);
 }
 
-void MPL3115A2::_one_shot(void)
+void MPL3115A2::_one_shot(void) noexcept
 {
 	this->_ctrl_reg1.reg = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::CTRL_REG1);
 	while (this->_ctrl_reg1.bit.OST) {
@@ -83,7 +83,7 @@ void MPL3115A2::_one_shot(void)
 	i2c_smbus_write_byte_data(this->smbus, MPL3115A2::CTRL_REG1, this->_ctrl_reg1.reg);
 }
 
-void MPL3115A2::_await_completion(std::uint8_t status)
+void MPL3115A2::_await_completion(std::uint8_t status) noexcept
 {
 	while (0 == (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::STATUS) & status)) {
 		nanosleep(&fivemillisec, nullptr);
@@ -92,7 +92,7 @@ void MPL3115A2::_await_completion(std::uint8_t status)
 			
 
 
-float MPL3115A2::pressure()
+float MPL3115A2::pressure(void) noexcept
 {
 	this->_set_mode(0);
 	this->_one_shot();
@@ -104,7 +104,7 @@ float MPL3115A2::pressure()
 }
 
 
-float MPL3115A2::altitude()
+float MPL3115A2::altitude(void) noexcept
 {
 	this->_set_mode(1);
 	this->_one_shot();
@@ -116,7 +116,7 @@ float MPL3115A2::altitude()
 }
 
 
-float MPL3115A2::temperature()
+float MPL3115A2::temperature(void) noexcept
 {
 	this->_one_shot();
 	this->_await_completion();
