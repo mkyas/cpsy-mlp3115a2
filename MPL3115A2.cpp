@@ -111,13 +111,7 @@ float MPL3115A2::altitude()
 	this->_await_completion();
 	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, 5, this->buffer);
 	std::uint32_t a;
-	if constexpr (std::endian::native == std::endian::big) {
-		a = std::uint32_t(this->buffer[0]) << 24 | std::uint32_t(this->buffer[1]) << 16 | std::uint32_t(this->buffer[2] << 8);
-	} else if constexpr (std::endian::native == std::endian::little) {
-		a = std::uint32_t(this->buffer[2]) << 24 | std::uint32_t(this->buffer[1]) << 16 | std::uint32_t(this->buffer[0] << 8);
-	} else {
-		throw std::runtime_error("Unknown endianess");
-	}
+	a = std::uint32_t(this->buffer[0]) * 16777216 + std::uint32_t(this->buffer[1]) * 65536 + std::uint32_t(this->buffer[2]) * 256;
 	return float(a) / 65536.0;
 }
 
