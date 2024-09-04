@@ -18,7 +18,7 @@ extern "C" {
 #include "MPL3115A2.hpp"
 
 
-static const timespec centisec = { 0, 10000000 };
+static const timespec fivemillisec = { 0, 5000000 };
 
 
 MPL3115A2::MPL3115A2(int smbus, std::uint8_t address) : smbus(0), address(address)
@@ -44,7 +44,7 @@ MPL3115A2::MPL3115A2(int smbus, std::uint8_t address) : smbus(0), address(addres
 
 	i2c_smbus_write_byte_data(this->smbus, MPL3115A2::CTRL_REG1, MPL3115A2::CTRL_REG1_RST);
 	while (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::CTRL_REG1) & MPL3115A2::CTRL_REG1_RST) {
-		nanosleep(&centisec, nullptr);
+		nanosleep(&fivemillisec, nullptr);
 	}
 
 	// set oversampling and altitude mode
@@ -76,7 +76,7 @@ void MPL3115A2::_one_shot(void)
 {
 	this->_ctrl_reg1.reg = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::CTRL_REG1);
 	while (this->_ctrl_reg1.bit.OST) {
-		nanosleep(&centisec, nullptr);
+		nanosleep(&fivemillisec, nullptr);
 		this->_ctrl_reg1.reg = i2c_smbus_read_byte_data(this->smbus, MPL3115A2::CTRL_REG1);
 	}
 	this->_ctrl_reg1.bit.OST = 1;
@@ -86,7 +86,7 @@ void MPL3115A2::_one_shot(void)
 void MPL3115A2::_await_completion(std::uint8_t status)
 {
 	while (0 == (i2c_smbus_read_byte_data(this->smbus, MPL3115A2::STATUS) & status)) {
-		nanosleep(&centisec, nullptr);
+		nanosleep(&fivemillisec, nullptr);
 	}
 }
 			
