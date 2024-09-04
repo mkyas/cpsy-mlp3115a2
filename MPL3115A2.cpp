@@ -97,7 +97,7 @@ float MPL3115A2::pressure()
 	this->_set_mode(0);
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, 5, this->buffer);
+	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::OUT_P_MSB, 5, this->buffer);
 	std::uint32_t p;
 	p = std::uint32_t(this->buffer[0]) * 65536 + std::uint32_t(this->buffer[1]) * 256 + std::uint32_t(this->buffer[2]);
 	return float(p) / 6400.0;
@@ -109,7 +109,7 @@ float MPL3115A2::altitude()
 	this->_set_mode(1);
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, 5, this->buffer);
+	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::OUT_P_MSB, 5, this->buffer);
 	std::uint32_t a;
 	a = std::uint32_t(this->buffer[0]) * 16777216 + std::uint32_t(this->buffer[1]) * 65536 + std::uint32_t(this->buffer[2]) * 256;
 	return float(a) / 65536.0;
@@ -120,7 +120,7 @@ float MPL3115A2::temperature()
 {
 	this->_one_shot();
 	this->_await_completion();
-	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::REGISTER_PRESSURE_MSB, 5, this->buffer);
+	i2c_smbus_read_i2c_block_data(this->smbus, MPL3115A2::OUT_P_MSB, 5, this->buffer);
 	std::uint32_t t;
 	t = std::uint32_t(this->buffer[3])* 256 + std::uint32_t(this->buffer[4]);
 	return float(t) / 256.0;
